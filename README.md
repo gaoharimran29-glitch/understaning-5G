@@ -568,3 +568,156 @@ It deals with real *radio signals, modulation, antennas, and frequency resources
 - Makes 5G *flexible, scalable, and efficient* for all use cases (IoT → broadband).
 
 ---
+
+## 1. Overview of RRC and NAS
+
+### RRC (Radio Resource Control)
+The RRC protocol operates between the **UE (User Equipment)** and **gNodeB** (5G base station). It is responsible for:
+- **System Information Broadcast:** Sharing network parameters needed by UE.
+- **Paging:** Alerting devices when data arrives.
+- **Connection Management:** Establishing and releasing RRC connections.
+- **Mobility Functions:** Handling handovers and transitions between cells.
+- **Measurement Configuration and Reporting:** Monitoring signal strength and quality.
+- **Device Capability Handling:** Managing UE’s features and configurations.
+
+### NAS (Non-Access Stratum)
+The NAS protocol functions between **UE** and the **AMF (Access and Mobility Management Function)** in the core network. Key responsibilities include:
+- **Authentication and Security:** Verifying identity and securing communication.
+- **Idle-Mode Procedures:** Managing UE in idle state.
+- **IP Address Assignment:** Allocating network resources.
+- **Registration Management:** Updating UE's presence in the network.
+
+---
+
+## 2. RRC and NAS States
+
+### IDLE State
+- UE is powered on but not registered.
+- No RRC context is established.
+- Requires attach procedure and RRC connection to move to connected mode.
+
+### CONNECTED State
+- UE is registered and has an RRC connection.
+- Capable of sending/receiving data.
+
+### INACTIVE State
+- Stores configuration and security context.
+- Allows faster reconnection without full reconfiguration.
+- Supports suspend and resume procedures.
+
+### State Transitions
+- **Attach / RRC Connect:** Moves from idle to connected.
+- **Detach / RRC Release:** Moves from connected to idle.
+- **RRC Suspend / Resume:** Enables temporary disconnection with stored context for fast reestablishment.
+
+---
+
+## 3. Mobility Functions
+
+### Idle and Inactive Mode Mobility
+- Controlled by UE.
+- Based on **RAN Areas (RAI)** and **Tracking Areas (TAI)**.
+- UE performs area updates as it moves.
+
+### Connected Mode Mobility
+- Controlled by the network.
+- Handover is managed by neighboring cells.
+- Based on measurements like **SS Blocks** for signal strength.
+
+---
+
+## 4. Initial Access Procedure
+
+### Purpose
+Initial access is the procedure through which a UE synchronizes with the network, detects its identity, and retrieves critical system information.
+
+### Steps
+
+#### 1. Cell Search
+- UE scans for synchronization signals to acquire timing and frequency information.
+- Detects **Physical Cell ID (PCI)** using:
+  - **Primary Synchronization Signal (PSS):** Identifies group ID.
+  - **Secondary Synchronization Signal (SSS):** Identifies full cell ID.
+  - **PBCH:** Carries system information.
+
+#### 2. Scan for PSS and SSS
+- UE searches for PSS across the frequency raster.
+- Identifies SSS and derives full cell ID (1008 possible PCI combinations).
+
+#### 3. Decode PBCH for MIB (Master Information Block)
+- Contains key parameters like:
+  - System bandwidth.
+  - Subframe number.
+  - Cell barred status.
+  - Subcarrier spacing.
+  - Parameters to acquire SIB1.
+
+#### 4. Decode SIB1 (System Information Block 1)
+- Provides:
+  - Cell selection and access info.
+  - Other SIB scheduling.
+
+#### 5. Other SIBs
+- Includes various information for cell reselection, frequency data, disaster alerts, and timing information:
+  - **SIB2:** Reselection across frequencies.
+  - **SIB3:** Intra-frequency reselection.
+  - **SIB4:** Inter-frequency reselection.
+  - **SIB5:** Reselection toward LTE.
+  - **SIB6-8:** Emergency notifications.
+  - **SIB9:** Timing data (UTC, GPS).
+
+---
+
+## 5. Random Access Procedure
+
+### Purpose
+Random access allows a UE to establish communication with the network when triggered by specific events such as:
+- Moving from idle to connected.
+- Uplink data arrival.
+- Synchronization loss.
+- Handover procedures.
+
+### Types of Random Access
+1. **Contention-Based Random Access (CBRA)**
+   - Used when UE randomly selects a preamble from a pool.
+   - Possible contention if multiple UEs choose the same preamble.
+2. **Contention-Free Random Access (CFRA)**
+   - Used during handovers or when the network pre-assigns a unique preamble to the UE.
+
+### CBRA Steps
+
+#### Step 1: Random Access Preamble (PRACH)
+- UE sends a random preamble to request network access.
+- Uses timing and power adjustments based on SS block measurements.
+
+#### Step 2: Random Access Response (RAR)
+- gNodeB acknowledges UE’s preamble.
+- Allocates temporary identifiers, timing corrections, and uplink resources.
+
+#### Step 3: Scheduled Transmission / Contention Resolution
+- UE sends its unique identity.
+- Handles contention scenarios where multiple UEs collide.
+
+#### Step 4: Connection Setup
+- Network resolves contention and establishes connection.
+- Assigns permanent identifiers (TC-RNTI to C-RNTI).
+
+### CFRA Steps
+- Triggered by handover or dedicated network instructions.
+- Uses pre-assigned preamble and grants.
+- Avoids contention altogether.
+
+### Summary of Random Access
+- Supports both contention-based and contention-free modes.
+- Ensures efficient access while managing interference and collisions.
+
+---
+
+## 6. Key Concepts Recap
+
+- **RRC** and **NAS** manage control and registration processes.
+- **Initial Access** allows a UE to join the network by scanning, decoding signals, and obtaining system info.
+- **Random Access** is essential for establishing communication, either through random selection or assigned resources.
+- Mobility is handled differently depending on UE state, with faster reconnects in inactive mode.
+
+---
