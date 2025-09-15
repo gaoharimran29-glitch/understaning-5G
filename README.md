@@ -721,3 +721,324 @@ Random access allows a UE to establish communication with the network when trigg
 - Mobility is handled differently depending on UE state, with faster reconnects in inactive mode.
 
 ---
+# 5G Core Network – Comprehensive Guide
+
+## 1. Core Network Identifiers
+
+In 5G Core Networks, identifiers are crucial for uniquely recognizing devices, subscriptions, and sessions. They ensure secure communication, seamless mobility, and proper routing of user data.
+
+### *Device Identifier (PEI)*
+- *PEI (Permanent Equipment Identifier):* Uniquely identifies each User Equipment (UE).
+- Stored in the device and transmitted securely.
+- Mainly used for:
+  - Device tracking
+  - Emergency calls
+  - Fraud prevention
+- *IMEI / IMEISV:* 
+  - *IMEI:* International Mobile Equipment Identity  
+  - *IMEISV:* IMEI with Software Version Number
+  - Components:
+    - TAC (Type Allocation Code)
+    - SNR (Serial Number)
+    - CD/SD (Check or Spare Digit)
+    - SVN (Software Version Number)
+
+### *Subscription Identifier (SUPI & SUCI)*
+- *SUPI (Subscription Permanent Identifier):*
+  - Based on IMSI (International Mobile Subscriber Identity).
+  - Structure:
+    - MCC (Mobile Country Code)
+    - MNC (Mobile Network Code)
+    - MSIN (Mobile Subscriber Identification Number)
+  - Represented as username@realm (e.g. 0<IMSI>@wlan.mnc<MNC>.mcc<MCC>.3gppnetwork.org).
+- *SUCI (Subscription Concealed Identifier):*
+  - Protects the SUPI against IMSI catching attacks.
+  - Ensures subscriber privacy through encryption.
+
+### *Temporary Identifier (GUTI)*
+- *GUTI (Globally Unique Temporary Identifier):*
+  - Combination of GUAMI + 5G-TMSI.
+  - *GUAMI (Globally Unique AMF ID):* Includes MCC, MNC, AMF Region ID, AMF Set ID, AMF Pointer.
+  - Enables secure re-identification of users without exposing permanent IDs.
+
+---
+
+## 2. Core Service-Based Architecture (SBA)
+
+The 5G Core is built on a *cloud-native service-based architecture (SBA)* for flexibility, scalability, and efficiency.
+
+### *Monolithic vs Service-Based Architecture*
+- *Monolithic:*
+  - Large, single codebase.
+  - Tight coupling between components.
+  - Limited scalability and flexibility.
+- *SBA (Microservices-based):*
+  - Modular, independent *Network Functions (NFs)*.
+  - Each NF exposes services to others using standard web APIs.
+  - Enables cloud-native deployment and network slicing.
+
+### *Key SBA Characteristics*
+- *Network Functions (NF):* Each NF provides one or more services (NF Service 1, 2, … n).
+- *Web-Based Interfaces:* Use HTTP/REST with:
+  - GET → Fetch data  
+  - POST → Create/Send data  
+  - PUT → Update/Replace data  
+  - DELETE → Remove data  
+
+### *Service Discovery & Registration*
+- *NRF (Network Repository Function):*
+  - Central registry of available NFs.
+  - Supports service registration, discovery, and status tracking.
+- *Process Overview:*
+  1. *Service Registration:* NF registers with NRF (HTTP PUT).
+  2. *Service Discovery:* Other NFs query NRF (HTTP GET).
+  3. *Service Request:* NFs request data/services (HTTP POST).
+  4. *Responses:* NRF returns acknowledgements or requested data.
+
+This architecture allows dynamic scaling, faster upgrades, and simpler integration with new services.
+
+---
+
+## 3. NF – AMF (Access and Mobility Management Function)
+
+The *AMF* is a critical network function in 5G Core responsible for managing access, mobility, and control plane signaling.
+
+### *Core Responsibilities*
+1. *Registration Management*
+   - Handles UE registration and deregistration.
+   - Establishes UE context in the network.
+   - Periodically updates registration state for mobility and capabilities.
+
+2. *Connection Management*
+   - Establishes and releases signaling connections (NAS and AS).
+   - Two states:
+     - *CM-IDLE:* No signaling, UE reachable through paging.
+     - *CM-CONNECTED:* Active signaling and data transfer.
+   - Uses:
+     - RRC signaling (UE ↔ gNB)
+     - N2 signaling (gNB ↔ AMF)
+
+3. *Mobility Management*
+   - Tracks UE location within the network.
+   - Supports seamless handovers between cells.
+   - Maintains updated UE context to ensure continuous service.
+
+### *RAN & Core Interaction*
+- UE and RAN store security and radio configurations.
+- Supports RRC Inactive state for fast resume after suspend.
+- Enables efficient signaling and optimized mobility procedures.
+
+---
+# 5G Core Network – Complete Reference Guide
+
+## 1. Core Network Identifiers
+
+Identifiers are essential for recognizing devices, subscriptions, and sessions within the 5G Core.
+
+### *Device Identity (PEI)*
+- *Permanent Equipment Identifier (PEI)* uniquely identifies the User Equipment (UE).
+- Used for:
+  - Device tracking
+  - Emergency call handling
+  - Fraud detection
+- *IMEI & IMEISV:*  
+  - IMEI = TAC (Type Allocation Code) + SNR (Serial Number) + CD/SD  
+  - IMEISV includes Software Version Number (SVN).
+
+### *Subscription Identity (SUPI & SUCI)*
+- *SUPI (Subscription Permanent Identifier):*  
+  - Usually the IMSI (MCC + MNC + MSIN).  
+  - Can also be represented as username@realm (Network Access Identifier).
+- *SUCI (Subscription Concealed Identifier):*  
+  - Protects SUPI from IMSI-catching attacks using encryption.
+
+### *Temporary Identity (GUTI)*
+- *GUTI = GUAMI + 5G-TMSI*  
+- *GUAMI* = MCC + MNC + AMF Region ID + AMF Set ID + AMF Pointer  
+- Provides privacy by avoiding frequent transmission of SUPI.
+
+---
+
+## 2. Core Service-Based Architecture (SBA)
+
+5G Core is designed on a *cloud-native microservices model* for flexibility and scalability.
+
+### *Monolithic vs SBA*
+- *Monolithic Architecture:* tightly coupled network nodes, less flexible.
+- *SBA:* loosely coupled *Network Functions (NFs)* communicating over REST APIs, allowing independent scaling and upgrades.
+
+### *Key Components*
+- *Network Functions (NFs):* Each NF offers services (NF Service 1, 2, n).
+- *Interfaces:*  
+  - Use HTTP REST with GET, POST, PUT, DELETE.  
+  - Web-based, enabling cloud deployment and orchestration.
+
+### *NRF – Network Repository Function*
+- Maintains a registry of available NFs.
+- Supports:
+  - *Service Registration:* NFs register via HTTP PUT.
+  - *Service Discovery:* Query available services via HTTP GET.
+  - *Service Request:* Consumption of services via HTTP POST.
+
+This design enables dynamic scaling, network slicing, and rapid feature deployment.
+
+---
+
+## 3. AMF – Access and Mobility Management Function
+
+AMF is the *control-plane brain* for access, mobility, and session handling.
+
+### *Core Functions*
+1. *Registration Management*
+   - Registers/deregisters UE.
+   - Establishes UE context.
+   - Periodically updates for mobility & capability changes.
+
+2. *Connection Management*
+   - Manages signaling between UE, gNB, and core.
+   - Two states:
+     - *CM-IDLE:* No signaling, UE reachable via paging.
+     - *CM-CONNECTED:* Active control-plane connection.
+   - Uses RRC (UE↔gNB) + N2 (gNB↔AMF) signaling.
+
+3. *Mobility Management*
+   - Tracks UE location.
+   - Supports seamless handovers.
+   - Maintains updated context to ensure uninterrupted service.
+
+---
+
+## 4. SMF – Session Management Function
+
+SMF is responsible for *PDU Session lifecycle management* and *user-plane control*.
+
+### *Key Responsibilities*
+- Setup, modification, and release of PDU sessions.
+- IP address allocation (IPv4, IPv6, dual-stack).
+- Selects appropriate:
+  - *UPF* (User Plane Function)
+  - *PCF* (Policy Control Function)
+- Handles charging (online & offline).
+- Communicates with other NFs via AMF.
+
+### *PDU Session Properties*
+- Session Identifier
+- Slice Identifier (S-NSSAI)
+- Data Network Name (DNN)
+- PDU Session Type (IP, Ethernet, or Unstructured)
+- Service & Session Continuity (SSC)
+- Security and QoS parameters
+
+### *Session Continuity Modes*
+- *SSC Mode 1:* Same IP, no break.
+- *SSC Mode 2:* Break-before-make (IP changes).
+- *SSC Mode 3:* Make-before-break (seamless transition).
+
+---
+
+## 5. UDM & UDR – Unified Data Management & Repository
+
+These functions provide centralized data management.
+
+### *UDR (Unified Data Repository)*
+- Stores:
+  - Subscription Data
+  - Policy Data
+  - Structured Data for Exposure
+  - Application Data
+
+### *UDM (Unified Data Management)*
+- Front-end logic for UDR.
+- Supports:
+  - Authentication
+  - Registration management
+  - Access management
+- Acts as the *brain* for subscription handling.
+
+---
+
+## 6. UPF – User Plane Function
+
+UPF is the *anchor point of user data traffic* in 5G Core.
+
+### *Key Functions*
+- Interconnects UE with external data networks (Internet, IMS, Enterprise).
+- Maintains session continuity during UE mobility.
+- Generates charging data records & traffic usage reports.
+- Performs:
+  - Packet forwarding (PFCP, PDR, FAR)
+  - QoS enforcement (QER)
+  - Buffering (BAR)
+  - Usage reporting (URR)
+
+---
+
+## Summary
+
+| Function | Responsibility |
+|---------|----------------|
+| *Identifiers* | Secure device, subscription, and session recognition |
+| *SBA* | Cloud-native service framework for flexibility and scaling |
+| *AMF* | Registration, connection, and mobility management |
+| *SMF* | PDU session setup and control-plane user-plane selection |
+| *UDM/UDR* | Centralized subscription data storage & access control |
+| *UPF* | Data forwarding, QoS, charging, and session anchoring |
+
+---
+
+# 5G Core Network - Policy Control Function (PCF)
+
+## Overview
+The *PCF (Policy Control Function)* is responsible for:
+- Managing rules and policies for *users, sessions, and data flows*.
+- Providing *policy control* to ensure optimal Quality of Service (QoS), charging rules, and session continuity.
+- Enforcing both *session-related* and *non-session-related* policies.
+
+---
+
+## Policy Levels
+Policies can be applied at multiple granularities:
+1. *All Users* – Network-wide policies applicable to every subscriber.
+2. *User-specific Services* – Policies tailored for all services of a particular user.
+3. *Session/Data Flow Specific* – Granular control over individual sessions or service flows.
+
+---
+
+## Types of Policies
+### 1. Non-session Management Related Policies
+These policies are independent of an active session and ensure efficient mobility and access management:
+- *Access and Mobility Management* – Controls user movement across networks.
+- *Service Area Restrictions* – Limits services to defined geographical areas.
+- *RAT/Frequency Selection Priority (RFSP)* – Guides device selection of Radio Access Technology and frequency.
+- *UE Route Selection Policy (URSP)* – Determines the routing of traffic from the User Equipment.
+- *Access Network Discovery and Selection Policy (ANDSP)* – Helps devices discover and select available access networks.
+- *Packet Flow Descriptors* – Define characteristics of packet flows for appropriate handling.
+
+### 2. Session Management Related Policies
+These apply to ongoing sessions and control how traffic is handled:
+- *Gating Control* – Blocks or allows specific IP packets based on service.
+- *QoS Control* – Ensures authorized service quality for IP flows.
+- *Policy and Charging Control (PCC) Rules* – Governs QoS and charging decisions.
+- *Service Data Flow (SDF) Templates* – Define flow structures for service identification.
+- *QoS Profiles & QoS Rules* – Provide fine-grained QoS enforcement and prioritization.
+
+---
+
+## PCF in the 5G Core Architecture
+The PCF interacts with several key components of the 5G core:
+- *AMF (Access and Mobility Management Function)* – Handles connection and mobility management.
+- *SMF (Session Management Function)* – Manages session establishment, modification, and release.
+- *UPF (User Plane Function)* – Enforces policies for traffic handling.
+- *UDM (Unified Data Management)* – Provides subscription and authentication data.
+- *AUSF (Authentication Server Function)* – Handles authentication procedures.
+- *gNodeB (5G Base Station)* – Connects the User Equipment (UE) to the 5G Core.
+
+---
+
+## Key Concepts
+- *QoS Rules & Profiles* – Define and enforce service quality.
+- *PCC Rules* – Control both policy enforcement and charging.
+- *SDF Templates* – Identify specific service flows for correct handling.
+- *Routing & Mobility Policies* – Ensure seamless user experience and optimized resource use.
+
+---
